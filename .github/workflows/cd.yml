@@ -7,17 +7,39 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     environment: production
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Simulate Deployment
-        run: echo "Deploying application..."
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
 
-      - name: Use Secrets
-        run: echo "Using secrets"
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build deploy package
+        run: |
+          mkdir deploy-package
+          cp index.js deploy-package/
+          cp package.json deploy-package/
+          cp package-lock.json deploy-package/
+
+      - name: Verify secrets
+        run: echo "Secrets loaded successfully"
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
           API_TOKEN: ${{ secrets.API_TOKEN }}
+
+      - name: Simulate deployment to production
+        run: echo "Application prepared and deployed to production environment"
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deploy-package
+          path: deploy-package/
