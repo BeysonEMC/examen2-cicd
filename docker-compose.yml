@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    container_name: examen2-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - examen2-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: examen2-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: examen2db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - examen2-network
+
+volumes:
+  postgres_data:
+
+networks:
+  examen2-network:
+    driver: bridge
